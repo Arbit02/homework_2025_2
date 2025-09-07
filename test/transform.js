@@ -42,4 +42,24 @@ QUnit.module('Тестируем функцию transform', () => {
         assert.deepEqual(result, {}, 'Пустой объект должен остаться пустым');
 
     })
+    QUnit.test('Обрабатывает null/undefind', (assert) => {
+        const originalObject = null;
+        const transformFunction = (value) => value * 4;
+        const result = transform(originalObject, transformFunction);
+        assert.deepEqual(originalObject, result, 'null должен оставаться null');
+    })
+    QUnit.test('Обрабатывает примитивы', (assert) => {
+        const originalObject = 125;
+        const transformFunction = (value) => value * 4;
+        const result = transform(originalObject, transformFunction);
+        assert.deepEqual(originalObject, result, 'Пустой объект должен остаться пустым');
+    })
+    QUnit.test('Сохраняет иммутабельность объектов', (assert) => {
+        const originalObject = { a: [1, 2, 3], b: 4 };
+        const transformFunction = (value) => value * 3;
+        const result = transform(originalObject, transformFunction);
+        assert.deepEqual(originalObject, { a: [1, 2, 3], b: 4 }, 'Оригинал не должен измениться');
+        assert.deepEqual(result, { a: [3, 6, 9], b: 12 }, 'Результат должен быть правильно преобразован');
+    })
 });
+
