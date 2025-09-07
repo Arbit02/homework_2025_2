@@ -10,18 +10,18 @@
  *
  * @returns {Object} - преобразованный объект
  */
-let transform = function(obj, transformFn) {
-    for (let key in obj) {
-        if(typeof obj[key] === 'object') {
-            transform(obj[key], transformFn);
+const transform = function(obj, transformFn) {
+
+    if (typeof obj !== 'object' || !obj) {
+        return obj;
+    }
+    const result = Array.isArray(obj) ? [] : {};
+    for (const key in obj) {
+        if (typeof obj[key] === 'object') {
+            result[key] = transform(obj[key], transformFn);
             continue;
         }
-        obj[key] = transformFn(obj[key]);
+        result[key] = transformFn(obj[key]);
     }
-    return obj;
+    return result;
 }
-
-
-
-
-
