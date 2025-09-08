@@ -11,17 +11,16 @@
  * @returns {Object} - преобразованный объект
  */
 const transform = function(obj, transformFn) {
-
-    if (typeof obj !== 'object' || !obj) {
-        return obj;
+    if (typeof obj !== 'object') {
+        throw new TypeError('obj must be an object');
     }
-    const result = Array.isArray(obj) ? [] : {};
+        const result = Array.isArray(obj) ? [] : {};
     for (const key in obj) {
-        if (typeof obj[key] === 'object') {
+        if (typeof obj[key] === 'object' && obj[key]) {
             result[key] = transform(obj[key], transformFn);
             continue;
         }
-        result[key] = transformFn(obj[key]);
+        result[key] = obj[key] ? transformFn(obj[key]) : obj[key] ;
     }
     return result;
 }
