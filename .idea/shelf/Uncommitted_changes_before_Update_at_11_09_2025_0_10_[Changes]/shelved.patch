@@ -1,0 +1,35 @@
+Index: test/transform.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/* eslint-disable require-jsdoc */\r\n\r\n'use strict';\r\n\r\nQUnit.module('Тестируем функцию transform', () => {\r\n    QUnit.test('Работает правильно с простыми объектами', (assert) => {\r\n        const originalObject = { a: 1, b: 2, c: 3 };\r\n        const transformFunction = (value) => value * 2;\r\n        const result = transform(originalObject, transformFunction);\r\n\r\n        assert.deepEqual(result, { a: 2, b: 4, c: 6 }, 'Значения должны быть умножены на 2');\r\n    });\r\n\r\n    QUnit.test('Работает правильно с вложенными объектами', (assert) => {\r\n        const originalObject = { a: 1, b: { c: 2, d: 3 }, e: 4 };\r\n        const transformFunction = (value) => value + 1;\r\n        const result = transform(originalObject, transformFunction);\r\n\r\n        assert.deepEqual(result, { a: 2, b: { c: 3, d: 4 }, e: 5 }, 'Значения должны быть увеличены на 1');\r\n    });\r\n\r\n    QUnit.test('Работает правильно с массивами', (assert) => {\r\n        const originalObject = { a: [1, 2, 3], b: 4 };\r\n        const transformFunction = (value) => value * 3;\r\n        const result = transform(originalObject, transformFunction);\r\n\r\n        assert.deepEqual(result, { a: [3, 6, 9], b: 12 }, 'Элементы массива должны быть умножены на 3');\r\n    });\r\n\r\n    QUnit.test('Работает с глубоко вложенными объектами', (assert) => {\r\n        const originalObject = { a : 1, b: {c : 12, d: { e: 3, f: { g: 4 } } } };\r\n        const transformFunction = (value) => value + 5;\r\n        const result = transform(originalObject, transformFunction);\r\n        assert.deepEqual(result, { a: 6, b : {c : 17, d : { e: 8, f: { g: 9 } } } }, 'Значения должны быть увеличены на 5');\r\n\r\n    })\r\n    QUnit.test('Работает с пустым объектом', (assert) => {\r\n        const originalObject = {};\r\n        const transformFunction = (value) => value * 4;\r\n        const result = transform(originalObject, transformFunction);\r\n        assert.deepEqual(result, {}, 'Пустой объект должен остаться пустым');\r\n    })\r\n    QUnit.test('Обрабатывает null/undefind', (assert) => {\r\n        const originalObject = undefined;\r\n        const transformFunction = (value) => value * 4;\r\n        assert.throws(() => transform(originalObject, transformFunction), TypeError, 'Пустой объект должен остаться пустым');\r\n    })\r\n    QUnit.test('Обрабатывает примитивы', (assert) => {\r\n        const originalObject = 125;\r\n        const transformFunction = (value) => value * 4;\r\n        assert.throws(() => transform(originalObject, transformFunction), TypeError, 'Пустой объект должен остаться пустым');\r\n    })\r\n    QUnit.test('Сохраняет иммутабельность объектов', (assert) => {\r\n        const originalObject = { a: [1, 2, 3], b: 4 };\r\n        const transformFunction = (value) => value * 3;\r\n        const result = transform(originalObject, transformFunction);\r\n        assert.deepEqual(originalObject, { a: [1, 2, 3], b: 4 }, 'Оригинал не должен измениться');\r\n        assert.deepEqual(result, { a: [3, 6, 9], b: 12 }, 'Результат должен быть правильно преобразован');\r\n    })\r\n    QUnit.test('Работает с null в качестве значения', (assert) => {\r\n        const originalObject = {a: [null, 2, 3], b: 4};\r\n        const transformFunction = (value) => value * 4;\r\n        const result = transform(originalObject, transformFunction);\r\n        assert.deepEqual(result, {a: [null, 8, 12], b: 16}, 'Значения должны быть увеличены в 4 раза, null пропускается');\r\n    })\r\n    QUnit.test('Работает с undefined в качестве значения', (assert) => {\r\n        const originalObject = {a: [undefined, 2, 3], b: 4};\r\n        const transformFunction = (value) => value * 4;\r\n        const result = transform(originalObject, transformFunction);\r\n        assert.deepEqual(result, {a: [undefined, 8, 12], b: 16}, 'Значения должны быть увеличены в 4 раза, undefined пропускается');\r\n    })\r\n});\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/test/transform.js b/test/transform.js
+--- a/test/transform.js	(revision d8a71ab246717c304d335ad7aa47ea9ecab8ef6a)
++++ b/test/transform.js	(date 1757325292620)
+@@ -48,7 +48,7 @@
+     QUnit.test('Обрабатывает примитивы', (assert) => {
+         const originalObject = 125;
+         const transformFunction = (value) => value * 4;
+-        assert.throws(() => transform(originalObject, transformFunction), TypeError, 'Пустой объект должен остаться пустым');
++        assert.throws(() => transform(originalObject, transformFunction), TypeError, 'В качестве параметров могут выступать только объекты');
+     })
+     QUnit.test('Сохраняет иммутабельность объектов', (assert) => {
+         const originalObject = { a: [1, 2, 3], b: 4 };
+Index: source/transform.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>'use strict';\r\n\r\n/**\r\n * Функция, преобразующуая значения объекта\r\n * @param {Object} obj - Объект, значения которого могут быть числами или вложенными объектами\r\n * @param {function(number) : number} transformFn - функция преобразования числа\r\n * @example\r\n * // returns { a: 2, b: { c: 3, d: 4 }, e: 5 }\r\n * transform({ a: 1, b: { c: 2, d: 3 }, e: 4 }, (value) => value + 1);\r\n *\r\n * @returns {Object} - преобразованный объект\r\n */\r\nconst transform = function(obj, transformFn) {\r\n    if (typeof obj !== 'object') {\r\n        throw new TypeError('obj must be an object');\r\n    }\r\n        const result = Array.isArray(obj) ? [] : {};\r\n    for (const key in obj) {\r\n        if (typeof obj[key] === 'object' && obj[key]) {\r\n            result[key] = transform(obj[key], transformFn);\r\n            continue;\r\n        }\r\n        result[key] = obj[key] ? transformFn(obj[key]) : obj[key] ;\r\n    }\r\n    return result;\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/source/transform.js b/source/transform.js
+--- a/source/transform.js	(revision d8a71ab246717c304d335ad7aa47ea9ecab8ef6a)
++++ b/source/transform.js	(date 1757325434551)
+@@ -24,3 +24,5 @@
+     }
+     return result;
+ }
++
++
