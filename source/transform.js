@@ -14,13 +14,13 @@ const transform = function(obj, transformFn) {
     if (typeof obj !== 'object') {
         throw new TypeError('obj must be an object');
     }
-        const result = Array.isArray(obj) ? [] : {};
-    for (const key in obj) {
-        if (typeof obj[key] === 'object' && obj[key]) {
-            result[key] = transform(obj[key], transformFn);
+    const result = Array.isArray(obj) ? [] : {};
+    for (const [key,value] of Object.entries(obj)) {
+        if (typeof value  === 'object' && value) {
+            result[key] = transform(value, transformFn);
             continue;
         }
-        result[key] = obj[key] ? transformFn(obj[key]) : obj[key] ;
+        result[key] = value ? transformFn(value) : value;
     }
     return result;
 }
